@@ -12,7 +12,10 @@ def accuracy(model,eval_data,device):
         for x,y in tqdm(eval_data):
             x,y = x.to(device),y.to(device)
             x_last, y_hat = model(x)
-            correct += torch.sum(torch.argmax(y_hat)==y)
+            # print(torch.argmax(y_hat,dim=1))
+            # print(y)
+            # break
+            correct += torch.sum(torch.argmax(y_hat,dim=1)==y)
             all += x.shape[0]
         return correct/all
 
@@ -41,8 +44,9 @@ def accuracy(model,eval_data,device):
 #     return test_loss_avg
 
 if __name__ == '__main__':
-    device = torch.device('cuda:0')
-    model = load_resnet_model()
+    use_gpu = True
+    device = torch.device("cuda:0" if use_gpu and torch.cuda.is_available() else "cpu")
+    model = load_resnet_model('D:\\Alon_temp\\singlang\\singLang_DLProg\\pretrained\\final_resnet_test_run_64.pt')
     data = get_dataloader('D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\test',64)
     ac = accuracy(model,data,device)
     print("ac=",ac)
