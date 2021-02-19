@@ -49,41 +49,32 @@ async def predictImg(roi):
     img_tensor = torch.tensor(roi)
     img_tensor = img_tensor.reshape((1,1,224,224))
     img_tensor = img_tensor.repeat((1,3,1,1))
-    print(img_tensor.shape)
 
     x, y = model(img_tensor.float())
-    max = torch.softmax(y,0)
 
+    max = torch.argmax( torch.sigmoid(y))
+    print(max)
 
-    img = cv2.resize(roi, (imgDim, imgDim))
-    #img = cv2.resize(roi, (224,3))
-    img = np.float32(img) / 255.
-    img = np.expand_dims(img, axis=-1)
-    img = np.expand_dims(img, axis=0)
-    img_tensor = torch.tensor(img)
-    #device = torch.device("cpu")
-    #img_tensor = img_tensor.to(device)
-
-    vec = model.predict(img)
-    pred = convertEnglishToHebrewLetter(classes[np.argmax(vec[0])])
-    maxVal = np.amax(vec)
-    if maxVal < threshold or pred == '':
-        pred = ''
-        count = freq
-    elif pred != prevPred:
-        prevPred = pred
-        count = freq
-    else:  # maxVal >= Threshold && pred == prevPred
-        count = count - 1
-        if count == 0:
-            count = freq
-            if pred == 'del':
-                sentence = sentence[:-1]
-            else:
-                sentence = sentence + pred
-            if pred == ' ':
-                pred = 'space'
-            print(finalizeHebrewString(sentence))
+    # vec = model.predict(img)
+    # pred = convertEnglishToHebrewLetter(classes[np.argmax(vec[0])])
+    # maxVal = np.amax(vec)
+    # if maxVal < threshold or pred == '':
+    #     pred = ''
+    #     count = freq
+    # elif pred != prevPred:
+    #     prevPred = pred
+    #     count = freq
+    # else:  # maxVal >= Threshold && pred == prevPred
+    #     count = count - 1
+    #     if count == 0:
+    #         count = freq
+    #         if pred == 'del':
+    #             sentence = sentence[:-1]
+    #         else:
+    #             sentence = sentence + pred
+    #         if pred == ' ':
+    #             pred = 'space'
+    #         print(finalizeHebrewString(sentence))
 
 
 def main():
