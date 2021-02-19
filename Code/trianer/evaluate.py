@@ -1,6 +1,6 @@
 import torch
 from tqdm import tqdm
-from singLang_DLProg.Code.data.dataloaders import get_dataloader
+from singLang_DLProg.Code.data.dataloaders import get_image_dataloader
 from singLang_DLProg.Code.utils.helpers import load_resnet_model
 
 
@@ -47,7 +47,7 @@ if __name__ == '__main__':
     use_gpu = True
     device = torch.device("cuda:0" if use_gpu and torch.cuda.is_available() else "cpu")
     model = load_resnet_model('D:\\Alon_temp\\singlang\\singLang_DLProg\\pretrained\\final_resnet_test_run_64.pt')
-    data = get_dataloader('D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\test',64)
+    data = get_image_dataloader('D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\test', 64)
     ac = accuracy(model,data,device)
     print("ac=",ac)
 
