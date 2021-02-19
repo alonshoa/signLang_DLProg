@@ -1,8 +1,9 @@
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import transforms
 from torch.utils.data import DataLoader
-from singLang_DLProg.Code.utils.get_image_size import get_image_size
+from Code.utils.get_image_size import get_image_size
 import torchvision
+import torch
 
 def check_valid(filename):
     t = get_image_size(filename)
@@ -16,7 +17,7 @@ def get_dataloader(path_to_data, batch_size=16):
 
 def get_mnist():
     from torchvision.datasets.mnist import MNIST
-    dataset = MNIST('D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts', transform=torchvision.transforms.ToTensor(),
+    dataset = MNIST('D:\\Desktop\\ofek\\STUDY\\university\\year6\\deepLearning\\final_project\\singLang_DLProg\\out_puts', transform=torchvision.transforms.ToTensor(),
                     download=True)
     print(len(dataset.classes))
     dataloader = DataLoader(dataset=dataset, batch_size=4, shuffle=True)
@@ -24,10 +25,14 @@ def get_mnist():
 
 
 if __name__ == '__main__':
-    test_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\debug'
-    dl = get_dataloader(test_path,batch_size=4)
+    test_path = 'D:\\Desktop\\ofek\\STUDY\\university\\year6\\deepLearning\\final_project\\images\\debug'
+    dl = get_dataloader(test_path,batch_size=1)
     x, y = iter(dl).next()
     # print(x.shape)
+    a = x[0,0] - x[0,2]
+    b = x[0, 0] - x[0, 1]
+    print(torch.unique(a))
+    print(torch.unique(b))
     print("-----")
     print(y.shape)
     print(y)

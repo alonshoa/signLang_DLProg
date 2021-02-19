@@ -2,10 +2,10 @@ import os
 import torch
 from tqdm import tqdm
 import torch.nn.functional as F
-from singLang_DLProg.Code.data.dataloaders import get_dataloader
-from singLang_DLProg.Code.models.resnet import SingLangResNet
-from singLang_DLProg.Code.trianer.evaluate import accuracy
-from singLang_DLProg.Code.utils.helpers import load_resnet_model
+from Code.data.dataloaders import get_dataloader
+from Code.models.resnet import SingLangResNet
+from Code.trianer.evaluate import accuracy
+from Code.utils.helpers import load_resnet_model
 
 
 def train_resnet(run_name,train_dataloader,eval_dataloader, model, optim,criteria=torch.nn.CrossEntropyLoss().cuda(), epochs=100,

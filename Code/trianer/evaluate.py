@@ -1,7 +1,7 @@
 import torch
 from tqdm import tqdm
-from singLang_DLProg.Code.data.dataloaders import get_dataloader
-from singLang_DLProg.Code.utils.helpers import load_resnet_model
+from Code.data.dataloaders import get_dataloader
+from Code.utils.helpers import load_resnet_model
 
 
 def accuracy(model,eval_data,device):
