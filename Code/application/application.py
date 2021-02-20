@@ -33,10 +33,10 @@ dataColor = (0, 255, 0)
 pred = ''
 prevPred = ''
 sentence = ""
+lastLetterWrote = ''
 freq = 15
 count = freq
-threshold = 0.8  # Between 0 and 1
-
+threshold = 5
 
 async def predictImg(roi):
     """
@@ -46,35 +46,33 @@ async def predictImg(roi):
     """
     global count, sentence
     global pred, prevPred
+    global lastLetterWrote
     img_tensor = torch.tensor(roi)
     img_tensor = img_tensor.reshape((1,1,224,224))
     img_tensor = img_tensor.repeat((1,3,1,1))
 
     x, y = model(img_tensor.float())
-
     max = torch.argmax( torch.sigmoid(y))
-    print(max)
+    pred = convertEnglishToHebrewLetter(classes[max])
 
-    # vec = model.predict(img)
-    # pred = convertEnglishToHebrewLetter(classes[np.argmax(vec[0])])
-    # maxVal = np.amax(vec)
-    # if maxVal < threshold or pred == '':
-    #     pred = ''
-    #     count = freq
-    # elif pred != prevPred:
-    #     prevPred = pred
-    #     count = freq
-    # else:  # maxVal >= Threshold && pred == prevPred
-    #     count = count - 1
-    #     if count == 0:
-    #         count = freq
-    #         if pred == 'del':
-    #             sentence = sentence[:-1]
-    #         else:
-    #             sentence = sentence + pred
-    #         if pred == ' ':
-    #             pred = 'space'
-    #         print(finalizeHebrewString(sentence))
+    if pred != prevPred:
+        #print ("changed letter pred is {} but was {}".format(pred, prevPred))
+        prevPred = pred
+        count = 0
+    elif count < threshold:
+        count = count + 1
+    elif lastLetterWrote != pred: #count == threshold and not didWritePred:
+        # if pred == 'del':
+        #     sentence = sentence[:-1]
+        # else:
+        #     sentence = sentence + pred
+        # if pred == ' ':
+        #     pred = 'space'
+        sentence = sentence + pred
+        lastLetterWrote = pred
+        print(finalizeHebrewString(sentence))
+
+
 
 
 def main():
