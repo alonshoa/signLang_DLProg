@@ -2,7 +2,7 @@ import os
 import torch
 from tqdm import tqdm
 import torch.nn.functional as F
-from singLang_DLProg.Code.data.dataloaders import get_dataloader
+from singLang_DLProg.Code.data.dataloaders import get_image_dataloader
 from singLang_DLProg.Code.models.resnet import SingLangResNet
 from singLang_DLProg.Code.trianer.evaluate import accuracy
 from singLang_DLProg.Code.utils.helpers import load_resnet_model
@@ -50,8 +50,8 @@ if __name__ == '__main__':
     test_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\test'
     out_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts'
     device = torch.device("cuda:0" if use_gpu and torch.cuda.is_available() else "cpu")
-    train_dl = get_dataloader(train_path,batch_size=128)
-    test_dl = get_dataloader(test_path,batch_size=128)
+    train_dl = get_image_dataloader(train_path, batch_size=128)
+    test_dl = get_image_dataloader(test_path, batch_size=128)
     model = load_resnet_model('D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts\\resnet_test_run_64_20000.pt')
     model = model.to(device)
     # optim = torch.optim.Adam(params=model.parameters(), lr=learning_rate)
