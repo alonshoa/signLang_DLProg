@@ -1,26 +1,36 @@
-import pandas as pd
-from torch import nn
-from torch.utils.data import dataloader
+import os
+from torchtext.data import Field, BucketIterator, TabularDataset
+import matplotlib.pyplot as plt
+
+def create_street_names_data_iterators(path,char_max_size=50,names_max_size=1000,batch_size=32,device='cuda'):
+    chars = Field(sequential=True, use_vocab=True, tokenize=lambda x: x.split(), lower=True)
+    names = Field(sequential=False, use_vocab=True, tokenize=lambda x: x, lower=True)
+
+    fields = {"chars": ("chars", chars), "street_name": ("names", names)}
 
 
-class HebDataloader(dataloader.DataLoader):
-    def __init__(self,root_dir,train=True,test=True):
-        assert train or test # load atleast one dataset
-        if train:
-            self.load_train(root_dir)
-        if test:
-            self.load_test(root_dir)
+    train_data, test_data = TabularDataset.splits(path="", train=os.path.join(path,"train_.csv"), test=os.path.join(path,"test_.csv"), format="csv", fields=fields)
 
-    def load_train(self, root_dir):
-        pass
+    chars.build_vocab(train_data, max_size=char_max_size, min_freq=2)
+    names.build_vocab(train_data, max_size=names_max_size, min_freq=1)
 
-    def load_test(self, root_dir):
-        pass
+    # print(chars.vocab)
+    # plt.hist(chars.vocab)
+    # plt.show()
+    # print(names.vocab.freqs)
 
+    train_iterator, test_iterator = BucketIterator.splits(
+        (train_data, test_data), batch_size=batch_size, device=device
+)
+    return train_iterator, test_iterator, chars.vocab, names.vocab
 
 if __name__ == '__main__':
-    df = pd.read_csv('/singLang_DLProg/text_data/rechovot_2_20190501.csv')
-    print(df.columns)
-    for i in range(5):
-        print(df.iloc[i]['street_name'].strip())
-    print(df.head())
+    path = "D:\\Alon_temp\\singlang\\singLang_DLProg\\text_data\\split"
+    train_iterator, test_iterator,_,_ = create_street_names_data_iterators(path)
+    # for batch in train_iterator:
+    #     print(batch.chars)
+    #     print(batch.names)
+    #
+
+
+

@@ -19,9 +19,10 @@ import os
 
 def split_train_test(file_name,out_path):
     df = pd.read_csv(file_name, header=None,names=['street_name'])
+    df['chars'] = df['street_name'].apply(lambda x: " ".join(x))
     train, test = train_test_split(df,test_size=0.1,random_state=42)
-    train.to_csv(os.path.join(out_path,"train.csv"),index=False,header=False)
-    test.to_csv(os.path.join(out_path,"test.csv"),index=False,header=False)
+    train.to_csv(os.path.join(out_path,"train_.csv"),index=False)
+    test.to_csv(os.path.join(out_path,"test_.csv"),index=False)
     # print(train)
 
 
