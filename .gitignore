@@ -128,3 +128,5 @@ dmypy.json
 images/
 images.zip
 out_puts/
+text_data/processed.csv
+text_data/rechovot_2_20190501.csv
