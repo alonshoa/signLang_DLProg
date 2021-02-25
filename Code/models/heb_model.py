@@ -31,6 +31,7 @@ class Attention(nn.Module):
         out_att = alphas.transpose(1,2)@x
         return out_att
 
+
 class HebLetterToSentence(nn.Module):
     def __init__(self, vocab_size,embedding_dim, lstm_size,hidden_dim, output_dim):
         super(HebLetterToSentence, self).__init__()
@@ -40,7 +41,6 @@ class HebLetterToSentence(nn.Module):
         self.num_layers = 1
 
 
-        # n_vocab = len(dataset.uniq_words)
         self.embedding = nn.Embedding(
             num_embeddings=vocab_size,
             embedding_dim=self.embedding_dim,
@@ -68,6 +68,18 @@ class HebLetterToSentence(nn.Module):
     def init_state(self, sequence_length):
         return (torch.zeros(self.num_layers, sequence_length, self.lstm_size))
 
+
+class ImgToWordModel(nn.Module):
+    def __init__(self,resnet_model,seq_model):
+        self.renet = resnet_model
+        self.seq = seq_model
+
+
+    def forward(self,x):
+        x_last,y = self.resnet(x)
+
+        res = self.seq(x_last)
+        return res
 
 if __name__ == '__main__':
     # from torchsummary import summary

@@ -5,7 +5,7 @@ from torchsummary import summary
 
 
 class SingLangResNet(ResNet):
-    def __init__(self,num_channels=3,num_classes=25):
+    def __init__(self,num_channels=3,num_classes=23):
         super(SingLangResNet, self).__init__(BasicBlock, [2, 2, 2, 2], num_classes=num_classes)
         self.conv1 = torch.nn.Conv2d(num_channels, 64,
             kernel_size=(7, 7),
@@ -27,7 +27,7 @@ class SingLangResNet(ResNet):
 
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
-        y_hat = self.fc(x)
+        y_hat = torch.log_softmax(self.fc(x),dim=1)
 
         return x,y_hat
 

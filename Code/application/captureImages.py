@@ -78,7 +78,7 @@ def captureImages():
 
         # get region of interest
         roi = frame[y0:y0 + width, x0:x0 + width]
-        roi = binaryMask(roi)
+        # roi = binaryMask(roi)
 
         # apply processed roi in frame
         if showMask:

@@ -125,7 +125,12 @@ dmypy.json
 .pyre/
 
 .idea/
-images/
+images/coloredCaptureData
+images/debug
+images/my_data
+images/test
+images/train
+images/validation
 images.zip
 out_puts/
 text_data/processed.csv
