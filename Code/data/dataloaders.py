@@ -10,6 +10,7 @@ def check_valid(filename):
     return t[0] == 224 and t[1] == 224
 
 
+
 def get_image_dataloader(path_to_data, batch_size=16):
     my_transforms = transforms.Compose([
         transforms.ToTensor(),
@@ -23,13 +24,12 @@ def get_image_dataloader(path_to_data, batch_size=16):
     dataset = ImageFolder(root=path_to_data, transform=my_transforms,is_valid_file=check_valid)
     print(len(dataset.classes))
     dataloader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
-    return dataloader
+    return dataloader,dataset
 
 
 def get_mnist():
     from torchvision.datasets.mnist import MNIST
-    dataset = MNIST('D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts', transform=torchvision.transforms.ToTensor(),
-                    download=True)
+    dataset = MNIST('D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts', transform=torchvision.transforms.ToTensor(),download=True)
     print(len(dataset.classes))
     dataloader = DataLoader(dataset=dataset, batch_size=4, shuffle=True)
     return dataloader

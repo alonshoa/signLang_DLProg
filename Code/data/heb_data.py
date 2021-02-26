@@ -18,7 +18,7 @@ def create_street_names_data_iterators(path,char_max_size=50,names_max_size=6000
     train_iterator, test_iterator = BucketIterator.splits(
         (train_data, test_data), batch_size=batch_size, device=device
 )
-    return train_iterator, test_iterator, chars.vocab, names.vocab
+    return train_iterator, test_iterator, chars.vocab, names.vocab,train_data, test_data
 
 def create_combined_dataset(test_path,img_path,char_max_size=50,names_max_size=60000,batch_size=32,device='cuda'):
     pass
