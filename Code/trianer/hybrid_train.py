@@ -35,14 +35,20 @@ class HybridDataSet(Dataset):
     def __getitem__(self, item):
         textItem = self.textDataSet[item]
 
+        imagesIndexes = []
         for hebLetter in textItem.chars:
             engLetter = self.hebToEngConvertor(hebLetter)
             imageIndexes = self.labelImageIndexDic[engLetter]
             randomImage = choice(imageIndexes)
-            image, letter = self.imageDataSet[randomImage]
+
+            imagesIndexes.append(randomImage)
+            # image, letter = self.imageDataSet[randomImage]
             # plt.imshow(image.squeeze(0).permute(1,2,0).numpy())
             # print(hebLetter)
             # plt.show()
+
+        images, letters = self.imageDataSet[imagesIndexes]
+        return images,textItem.names
 
     def hebToEngConvertor(self,x):
         return {
@@ -84,4 +90,5 @@ if __name__ == '__main__':
 
     hybridDataSet = HybridDataSet(imageDataSet,test_data)
     dataloader = DataLoader(dataset=hybridDataSet, batch_size=16, shuffle=True)
-    # someItem = hybridDataSet.__getitem__(2)
+    someItem = hybridDataSet.__getitem__(2)
+    print()
