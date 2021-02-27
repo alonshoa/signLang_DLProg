@@ -46,9 +46,12 @@ class HybridDataSet(Dataset):
             # plt.imshow(image.squeeze(0).permute(1,2,0).numpy())
             # print(hebLetter)
             # plt.show()
+        imagesFromDataSet = []
+        for index in imagesIndexes:
+            images, letters = self.imageDataSet[index]
+            imagesFromDataSet.append(images)
 
-        images, letters = self.imageDataSet[imagesIndexes]
-        return images,textItem.names
+        return imagesFromDataSet,textItem.names
 
     def hebToEngConvertor(self,x):
         return {
