@@ -31,7 +31,9 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 #model.load_weights(modelWeights)
 # model = load_resnet_model()
 # D:\Alon_temp\singlang\singLang_DLProg\out_puts\final_resnet_with_aug_colored_test_run_64.pt
-model = load_resnet_model("D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts\\final_resnet_with_aug_colored_test_run_64.pt")
+# model = load_resnet_model("D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts\\final_resnet_with_aug_colored_test_run_64.pt")
+model = load_resnet_model('D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts\\final_resnet_with_aug_colored_pretrained_test_run_64_trainer.pt')
+model.eval()
 dataColor = (0, 255, 0)
 pred = ''
 prevPred = ''
@@ -40,8 +42,7 @@ lastLetterWrote = ''
 freq = 15
 count = freq
 threshold = 5
-y_last = None
-cs = 0
+
 
 async def predictImg(roi):
     """
@@ -50,23 +51,14 @@ async def predictImg(roi):
     :param roi: preprocessed image.
     """
     global count, sentence
-    global pred, prevPred, y_last, cs
+    global pred, prevPred
     global lastLetterWrote
-    img_tensor = torch.tensor(roi).permute(2,0,1)
-    # print(img_tensor.shape)
-    # exit()
-    # img_tensor = img_tensor.reshape((1,1,224,224))
-    # img_tensor = img_tensor.repeat((1,3,1,1))
-    cs+=1
-    # if(cs %100 == 0):
-    #     plt.imshow(img_tensor.squeeze(0).permute(1, 2, 0))
-    #     plt.show()
-    x, y = model(img_tensor.unsqueeze(0).float())
+
+    img_tensor = torch.tensor(roi).permute(2,0,1) / 255
+
+    x, y = model(img_tensor.unsqueeze(0))
     max = torch.argmax(y,dim=1)
     pred = convertEnglishToHebrewLetter(classes[max])
-    # if (y_last is not None):
-    #     print(y - y_last)
-    y_last = y
     if pred != prevPred:
         #print ("changed letter pred is {} but was {}".format(pred, prevPred))
         prevPred = pred

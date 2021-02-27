@@ -27,12 +27,13 @@ class SingLangResNet(ResNet):
 
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
-        y_hat = torch.log_softmax(self.fc(x),dim=1)
+        y_hat = torch.softmax(self.fc(x),dim=1)
 
         return x,y_hat
 
 
 if __name__ == '__main__':
+# model summary
     model = SingLangResNet()
     summary(model.cuda(), input_size=(3, 224, 224))
 
