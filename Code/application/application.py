@@ -23,12 +23,17 @@ from Code.application.projectParams import *
 import asyncio
 from PIL import ImageDraw, Image
 import os
+import matplotlib.pyplot as plt
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
 
 # Globals
 #model = load_model(modelPath)
 #model.load_weights(modelWeights)
-model = load_resnet_model()
+# model = load_resnet_model()
+# D:\Alon_temp\singlang\singLang_DLProg\out_puts\final_resnet_with_aug_colored_test_run_64.pt
+# model = load_resnet_model("D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts\\final_resnet_with_aug_colored_test_run_64.pt")
+model = load_resnet_model('D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts\\final_resnet_with_aug_colored_pretrained_test_run_64_trainer.pt')
+model.eval()
 dataColor = (0, 255, 0)
 pred = ''
 prevPred = ''
@@ -37,6 +42,7 @@ lastLetterWrote = ''
 freq = 15
 count = freq
 threshold = 5
+
 
 async def predictImg(roi):
     """
@@ -47,14 +53,12 @@ async def predictImg(roi):
     global count, sentence
     global pred, prevPred
     global lastLetterWrote
-    img_tensor = torch.tensor(roi)
-    img_tensor = img_tensor.reshape((1,1,224,224))
-    img_tensor = img_tensor.repeat((1,3,1,1))
 
-    x, y = model(img_tensor.float())
-    max = torch.argmax( torch.sigmoid(y))
+    img_tensor = torch.tensor(roi).permute(2,0,1) / 255
+
+    x, y = model(img_tensor.unsqueeze(0))
+    max = torch.argmax(y,dim=1)
     pred = convertEnglishToHebrewLetter(classes[max])
-
     if pred != prevPred:
         #print ("changed letter pred is {} but was {}".format(pred, prevPred))
         prevPred = pred
@@ -100,7 +104,7 @@ def main():
 
         # get region of interest
         roi = frame[y0:y0 + width, x0:x0 + width]
-        roi = binaryMask(roi)
+        # roi = binaryMask(roi)
 
         # apply processed roi in frame
         if showMask:
