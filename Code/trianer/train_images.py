@@ -11,7 +11,7 @@ class Trainer:
     def __init__(self, train_dataloader,eval_dataloader, model, optim,summary_writer,
                  criteria=torch.nn.CrossEntropyLoss().cuda(), save_checkpoint=200):
         self.summary_writer = summary_writer
-        self.save_checkpoint = save_checkpoint
+        self.save_model_every = save_checkpoint
         self.criteria = criteria
         self.optim = optim
         self.model = model
@@ -25,41 +25,44 @@ class Trainer:
         loss_log = []
         acc_log = []
         run_out_path = os.path.join(out_path, run_name)
-        os.makedirs(run_out_path,exist_ok=True)
+        os.makedirs(run_out_path, exist_ok=True)
         if self.summary_writer is None:
             summary_writer = SummaryWriter()
         else:
             summary_writer = self.summary_writer
-        runexample = iter(self.train_dataloader).next()
-        print(len(runexample))
 
-        self.model = self.model.to(device)
-        summary_writer.add_graph(self.model, runexample[0].to(device))
 
 
         for epoch in range(epochs):
             # run epoch optimization
             avg_loss = self.train_epoch()
 
-            # display
-            acc_test = accuracy(self.model, self.eval_dataloader, device)
-            # acc_train = accuracy(self.model, self.train_dataloader, device)
-            print(f"loss[{epoch}] = {avg_loss / self.train_size}")
-            print(f"acc[{epoch}] = {acc_test.item()}")
-            loss_log.append(avg_loss / self.train_size)
-            summary_writer.add_scalar("loss_train",avg_loss, global_step=epoch)
-            summary_writer.add_scalar("accuracy_test",acc_test.item(), global_step=epoch)
-            # summary_writer.add_scalar("accuracy_train",acc_train.item())
-            acc_log.append(acc_test)
+            self.log_epoch(acc_log, avg_loss, device, epoch, loss_log, summary_writer)
             avg_loss = 0
 
             # save model
-            if epoch > 0 and epoch % self.save_checkpoint == 0:
-                torch.save(model.state_dict(), os.path.join(run_out_path, f"resnet_{run_name}_{epoch}.pt"))
+            self.save_checkpoint(epoch, run_name, run_out_path)
 
             # acc_log.append(accuracy(model,eval_dataloader))
 
         return loss_log, acc_log
+
+    def save_checkpoint(self, epoch, run_name, run_out_path):
+        if epoch > 0 and epoch % self.save_model_every == 0:
+            torch.save(self.model.state_dict(), os.path.join(run_out_path, f"resnet_{run_name}_{epoch}.pt"))
+
+
+    def log_epoch(self, acc_log, avg_loss, device, epoch, loss_log, summary_writer):
+        # display
+        acc_test = accuracy(self.model, self.eval_dataloader, device)
+        # acc_train = accuracy(self.model, self.train_dataloader, device)
+        print(f"loss[{epoch}] = {avg_loss / self.train_size}")
+        print(f"acc[{epoch}] = {acc_test.item()}")
+        loss_log.append(avg_loss / self.train_size)
+        summary_writer.add_scalar("loss_train", avg_loss, global_step=epoch)
+        summary_writer.add_scalar("accuracy_test", acc_test.item(), global_step=epoch)
+        # summary_writer.add_scalar("accuracy_train",acc_train.item())
+        acc_log.append(acc_test)
 
     def train_epoch(self):
         avg_loss = 0
@@ -71,32 +74,39 @@ class Trainer:
             loss = self.criteria(y_hat, y)
             avg_loss += loss.item()
             loss.backward()
-            optim.step()
+            self.optim.step()
         return avg_loss / len(self.train_dataloader)
 
 if __name__ == '__main__':
 
     use_gpu = True
     learning_rate = 0.001
-    # train_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\train'
-    train_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\coloredCaptureData\\train'
-    test_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\coloredCaptureData\\test'
-    # # debug
-    # train_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\coloredCaptureData_debug'
-    # test_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\coloredCaptureData_debug'
+    # # train_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\train'
+    # train_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\coloredCaptureData\\train'
+    # test_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\coloredCaptureData\\test'
+    # # # debug
+    train_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\coloredCaptureData_debug'
+    test_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\coloredCaptureData_debug'
     out_path = 'D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts'
     device = torch.device("cuda:0" if use_gpu and torch.cuda.is_available() else "cpu")
-    train_dl = get_image_dataloader(train_path, batch_size=128)
+    train_dl,_ = get_image_dataloader(train_path, batch_size=128)
     print(train_dl.dataset.classes)
-    test_dl = get_image_dataloader(test_path, batch_size=128)
+    test_dl,_ = get_image_dataloader(test_path, batch_size=128)
     # model = load_resnet_model('')
     model = get_pretrained_resnet()
     model = model.to(device)
     optim = torch.optim.Adam(params=model.parameters(), lr=learning_rate)
     # optim = torch.optim.Adagrad(params=model.parameters(), lr=learning_rate)
-    summary_writer = SummaryWriter(comment="pretrained")
+    summary_writer = SummaryWriter(comment="_debugging")
     run_name = "with_aug_colored_pretrained_test_run_64_trainer"
     try:
+        runexample = next(iter(train_dl))
+        print(len(runexample))
+        model = model.to(device)
+        # print model in tensorboard
+
+        summary_writer.add_graph(model, runexample[0].to(device))
+
         trainer = Trainer( train_dataloader=train_dl, eval_dataloader=test_dl, model=model, optim=optim,summary_writer=summary_writer, save_checkpoint=1)
         loss_log, acc_log = trainer.train(run_name,  out_path=out_path, epochs=45, device=device)
 

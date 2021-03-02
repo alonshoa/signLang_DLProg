@@ -5,8 +5,9 @@ import torch.nn.functional as F
 
 
 class Attention(nn.Module):
-    def __init__(self,hidden_dim):
+    def __init__(self,hidden_dim,RNN_layers=3):
         super(Attention, self).__init__()
+        self.rnn_layers = RNN_layers
         self.register_parameter('v', torch.nn.Parameter(torch.empty((1, hidden_dim), dtype=torch.float)))
         self.att_w = torch.nn.Linear(in_features=2 * hidden_dim, out_features=hidden_dim)
         self.initialize_param()
@@ -17,7 +18,7 @@ class Attention(nn.Module):
     def forward(self,x,h):
         # print("out.shape",x.shape)
         # print("h.shape",h.shape)
-        h = h.repeat(x.shape[0], 1, 1)
+        h = h[-1].repeat(x.shape[0] , 1, 1)
         # print("out.shape",x.shape)
         # print("h.shape",h.shape)
 
@@ -38,7 +39,7 @@ class HebLetterToSentence(nn.Module):
         self.lstm_size = lstm_size
         self.hidden_dim = hidden_dim
         self.embedding_dim = embedding_dim
-        self.num_layers = 1
+        self.num_layers = 3
 
 
         self.embedding = nn.Embedding(
@@ -70,7 +71,7 @@ class HebLetterToSentence(nn.Module):
 
 
 class ImgToWordModel(nn.Module):
-    def __init__(self,resnet_model,seq_model):
+    def __init__(self, resnet_model, seq_model):
         self.renet = resnet_model
         self.seq = seq_model
 
