@@ -3,7 +3,7 @@ from torchtext.data import Field, BucketIterator, TabularDataset
 import matplotlib.pyplot as plt
 
 def create_street_names_data_iterators(path,char_max_size=50,names_max_size=60000,batch_size=32,device='cuda'):
-    chars = Field(sequential=True, use_vocab=True, tokenize=lambda x: x.split(), lower=True)
+    chars = Field(sequential=True, use_vocab=True, tokenize=lambda x: x.split(), lower=True,fix_length=18)
     names = Field(sequential=False, use_vocab=True, tokenize=lambda x: x, lower=True)
 
     fields = {"chars": ("chars", chars), "street_name": ("names", names)}
