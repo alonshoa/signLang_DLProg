@@ -22,7 +22,7 @@ class Heb_trainer(Trainer):
             self.model.train()
             self.optim.zero_grad()
             x, y = batch.chars.to(device),batch.names.to(device)  #x.to(device), y.to(device)
-            h0 = model.init_state(x.shape[0]).to(device)
+            h0 = self.model.init_state(x.shape[0]).to(device)
             out, ht = self.model(x.T,h0)
             loss = self.criteria(out.squeeze(1), y)
             avg_loss += loss.item()
