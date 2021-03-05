@@ -9,7 +9,7 @@ from Code.data.hybrid_data import HybridDataSet
 from Code.models.heb_model import HebLetterToSentence
 from Code.models.hybrid_model import HybridModel
 from Code.trianer.train_images import Trainer
-from Code.utils.helpers import load_resnet_model
+from Code.utils.helpers import load_resnet_model, set_grads_to_false
 
 
 class HybridTrainer(Trainer):
@@ -52,7 +52,7 @@ class HybridTrainer(Trainer):
 if __name__ == '__main__':
     use_gpu = True
     device = torch.device("cuda:0" if use_gpu and torch.cuda.is_available() else "cpu")
-    path_to_data = "D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\coloredCaptureData"
+    path_to_data = "D:\\Alon_temp\\singlang\\singLang_DLProg\\images\\coloredCaptureData\\train"
     _,imageDataSet = get_image_dataloader(path_to_data, batch_size=16)
 
     # path = "C:\\HW\\singLang_DLProg\\text_data\\split"
@@ -61,26 +61,27 @@ if __name__ == '__main__':
     train_iterator, test_iterator,vocab_letters,vocab_words,train_data,test_data  = create_street_names_data_iterators(path)
 
     hybridDataSet = HybridDataSet(imageDataSet,test_data,vocab_words)
-    dataloader = DataLoader(dataset=hybridDataSet, batch_size=2, shuffle=True)
+    dataloader = DataLoader(dataset=hybridDataSet, batch_size=4, shuffle=True)
     # someItem = hybridDataSet.__getitem__(2)
     # print(someItem[0].shape)
     # print(hybridDataSet.word_max_len)
     # def __init__(self, vocab_size,embedding_dim, lstm_size,hidden_dim, output_dim):
 
     text_model = HebLetterToSentence(len(vocab_letters), 128, 512, 128,len(vocab_words),use_self_emmbed=True)
-    image_model = load_resnet_model('')
+    image_model = load_resnet_model('D:\\Alon_temp\\singlang\\singLang_DLProg\\out_puts\\final_resnet_with_aug_colored_pretrained_test_run_64_trainer.pt')
 
-
+    image_model = set_grads_to_false(image_model)
+    # exit(12)
     model = HybridModel(image_model,text_model).to(device)
     optimizer = torch.optim.Adam(model.parameters(),lr=0.001)
 
-    writer = SummaryWriter(comment="full_train")
+    writer = SummaryWriter(comment="full_train_pretrained_resnet_no_image_update")
     # print(model)
     # x,y = next(iter(dataloader))
     # print(model(x))
     trainer = HybridTrainer(dataloader, test_iterator, model, optimizer, writer,save_checkpoint=5,device=device)
 
-    trainer.train("full_run_test",epochs=100, device=device)
+    trainer.train("full_run_test_no_image_update",epochs=100, device=device)
 
 
 

@@ -1,6 +1,10 @@
 import torch
+from torch.hub import load_state_dict_from_url
+from torchvision.models import ResNet
+
 from Code.models.resnet import SingLangResNet
 from torchvision import models
+
 
 
 import os
@@ -56,3 +60,9 @@ def load_resnet_model(model_name=model_name):
 
 def save_model(model,path):
     torch.save(model.state_dict(), path)
+
+
+def set_grads_to_false(model):
+    for param in model.parameters():
+        param.requires_grad = False
+    return model
