@@ -67,9 +67,10 @@ class HybridDataSet(Dataset):
         #     imagesFromDataSet.append(images) (n,n).unsqu(2)  --> (n,n,1)
         # 3 (n,n)*3 ---> (n,3n)
         # 3 (n,n)*3 ---> (3,n,n)
-        word_tkn = self.word_vocab.stoi[textItem.names[0]]
+        word_tkns = self.word_vocab[textItem.names]
+        # print(word_tkns)
         imagesFromDataSet = torch.cat([self.imageDataSet[index][0].unsqueeze(0) for index  in imagesIndexes],dim=0)
-        return imagesFromDataSet, word_tkn
+        return imagesFromDataSet, word_tkns
 
     def hebToEngConvertor(self,x):
         w_ = {
@@ -125,10 +126,11 @@ if __name__ == '__main__':
     # path = "C:\\HW\\singLang_DLProg\\text_data\\split"
     path = "D:\\Alon_temp\\singlang\\singLang_DLProg\\text_data\\split"
 
-    train_iterator, test_iterator,char_vocab,word_vocab,train_data,test_data  = create_street_names_data_iterators(path)
+    train_iterator, test_iterator,char_vocab,word_vocab,train_data,test_data,names  = create_street_names_data_iterators(path)
 
-    hybridDataSet = HybridDataSet(imageDataSet,test_data,word_vocab)
+    hybridDataSet = HybridDataSet(imageDataSet,test_data,names)
     dataloader = DataLoader(dataset=hybridDataSet, batch_size=16, shuffle=True)
     someItem = hybridDataSet.__getitem__(2)
+    someItem = hybridDataSet.__getitem__(23)
     print(someItem[0].shape)
     print(hybridDataSet.word_max_len)

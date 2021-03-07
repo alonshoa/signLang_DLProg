@@ -136,3 +136,5 @@ out_puts/
 text_data/processed.csv
 text_data/rechovot_2_20190501.csv
 /Code/trianer/runs/
+Code/trianer/full_run_test_pretrained/
+Code/trianer/full_train_no_pretrained/

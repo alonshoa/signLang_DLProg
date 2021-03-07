@@ -65,7 +65,7 @@ class HebLetterToSentence(nn.Module):
         outputs = self.attention(output, state)
         # print("outs.shape", outputs.shape)
 
-        logits = self.fc(outputs)
+        logits = torch.sigmoid(self.fc(outputs))
         return logits, state
 
     def init_state(self, sequence_length):

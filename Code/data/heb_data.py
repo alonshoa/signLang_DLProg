@@ -11,14 +11,13 @@ def create_street_names_data_iterators(path,char_max_size=50,names_max_size=6000
 
     train_data, test_data = TabularDataset.splits(path="", train=os.path.join(path,"train_.csv"), test=os.path.join(path,"test_.csv"), format="csv", fields=fields)
 
-    chars.build_vocab(train_data, max_size=char_max_size, min_freq=2)
+    chars.build_vocab(train_data,test_data, max_size=char_max_size, min_freq=2)
     names.build_vocab(train_data, max_size=names_max_size, min_freq=1)
-
 
     train_iterator, test_iterator = BucketIterator.splits(
         (train_data, test_data), batch_size=batch_size, device=device
 )
-    return train_iterator, test_iterator, chars.vocab, names.vocab,train_data, test_data
+    return train_iterator, test_iterator, chars.vocab, names.vocab,train_data, test_data, names
 
 def create_combined_dataset(test_path,img_path,char_max_size=50,names_max_size=60000,batch_size=32,device='cuda'):
     pass
